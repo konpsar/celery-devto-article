@@ -21,12 +21,12 @@ services:
       - '5555:5555'
     depends_on:
       - redis
-  redis-cli:
-    image: redis:latest
-    links:
-      - redis
-      - flower
-    command: redis-cli -h redis
+  # redis-cli:
+  #   image: redis:latest
+  #   links:
+  #     - redis
+  #     - flower
+  #   command: redis-cli -h redis
 volumes:
   cache:
     driver: local

@@ -1,10 +1,89 @@
+## How to run:
 
+Install first dependencies
 
-## Sources:
+```
+python -m pip install -r requirements.txt
+```
+
+Run docker (Rancher with WSL2 for me)
+
+```
+docker compose up
+```
+
+(and later stop with `docker compose down -v`)
+Gevent is necessary for Windows users.
+
+Start celery task
+
+```
+celery -A app.xxx worker --loglevel=info --hostname=blog_app -P gevent
+```
+
+Start app
+
+```
+python app.py
+```
+
+### How to test manually:
+
+In your browser navigate to
+```
+http://127.0.0.1:5000/hello
+```
+
+You will get some json
+
+```
+{
+  "status": "Task has been submitted",
+  "task_id": "26e99828-2285-48be-8c52-ff4221129c0f"
+}
+```
+
+To see whats going on take the task_id and nvaigate to
+
+```
+http://127.0.0.1:5000/hellowait/26e99828-2285-48be-8c52-ff4221129c0f
+```
+
+If the task id does not exist you will get a 404
+
+with content
+
+```
+{
+  "exists": false,
+  "result": null
+}
+```
+
+If pending you will get the same content but with status 204.
+
+Otherwise you will get a 200 status with the result
+
+```
+{
+  "exists": true,
+  "result": "Hello, World!"
+}
+```
+
+### How to test automatically:
+
+pytest .
+
+## References (sources I consulted):
 
 ***Tutorial:***
 
 [https://medium.com/@shreshthbansal2505/using-flask-with-celery-and-flower-a-simple-guide-e0268b9d729a]()
+
+***Backend troubleshooting:***
+
+[https://stackoverflow.com/questions/76834173/how-does-celery-asyncresult-function-know-which-broker-or-backend-to-query]()
 
 ***Configure Flowerdocker compose:***
 
