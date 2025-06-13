@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - cache:/data
+  flower:
+    image: mher/flower:latest
+    # command: ['celery flower', '--broker=redis://redis:6379', '--port=5555']
+    environment:
+      FLOWER_PORT : 5555
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      FLOWER_BROKER_API: "redis://redis:6379/0"
+    expose:
+      - 5555
+    ports:
+      - '5555:5555'
+    depends_on:
+      - redis
+  redis-cli:
+    image: redis:latest
+    links:
+      - redis
+      - flower
+    command: redis-cli -h redis
+volumes:
+  cache:
+    driver: local
