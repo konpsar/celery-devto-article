@@ -1,9 +1,9 @@
 ## How to run:
 
-Install first dependencies
+Install first dependencies (dev for development)
 
 ```
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 ```
 
 Run docker (Rancher with WSL2 for me)
@@ -71,9 +71,40 @@ Otherwise you will get a 200 status with the result
 }
 ```
 
+After finishing
+
+```
+docker compose down -v
+```
+
 ### How to test automatically:
 
+First build the docker image
+
+```
+docker compose -f .\docker-compose-dev.yml build
+```
+
+and then start the app
+
+```
+docker compose -f .\docker-compose-dev.yml up
+```
+
+Now run the test.
+
+```
 pytest .
+```
+
+It may take 10 secs to run because of the delay.
+
+
+After finishing
+
+```
+docker compose -f .\docker-compose-dev.yml down -v
+```
 
 ## References (sources I consulted):
 

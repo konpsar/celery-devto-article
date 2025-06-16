@@ -3,16 +3,20 @@ from celery import Celery
 from celery.result import AsyncResult
 import time
 import redis
+import config_app
 
 app = Flask(__name__)
 
 # Configure Celery
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+app.config['CELERY_BROKER_URL'] = config_app.CELERY_BROKER_URL
+app.config['CELERY_RESULT_BACKEND'] = config_app.CELERY_RESULT_BACKEND
 
-redis_server = redis.Redis('localhost', 6379)
+print(config_app.REDIS_HOST)
+print(config_app.REDIS_PORT)
+
+redis_server = redis.Redis(config_app.REDIS_HOST, config_app.REDIS_PORT)
 redis_server.set('taskid_list', '')
-xxx = Celery(app.name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'])
+xxx = Celery(app.name, backend=config_app.CELERY_RESULT_BACKEND, broker=config_app.CELERY_BROKER_URL)
 # celery.conf.update(app.config)
 
 # Define a Celery task
