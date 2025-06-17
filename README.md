@@ -1,3 +1,7 @@
+## The article
+
+Medium post with more details, [https://fithis2001.medium.com/beginners-celery-flask-example-57e45236016a](here)
+
 ## How to run:
 
 Install first dependencies (dev for development)
