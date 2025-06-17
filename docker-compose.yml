@@ -10,7 +10,6 @@ services:
       - cache:/data
   flower:
     image: mher/flower:latest
-    # command: ['celery flower', '--broker=redis://redis:6379', '--port=5555']
     environment:
       FLOWER_PORT : 5555
       CELERY_BROKER_URL: "redis://redis:6379/0"
@@ -21,12 +20,6 @@ services:
       - '5555:5555'
     depends_on:
       - redis
-  # redis-cli:
-  #   image: redis:latest
-  #   links:
-  #     - redis
-  #     - flower
-  #   command: redis-cli -h redis
 volumes:
   cache:
     driver: local

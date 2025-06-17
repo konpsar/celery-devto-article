@@ -5,26 +5,20 @@ import time
 import redis
 import config_app
 
-app = Flask(__name__)
-
-# Configure Celery
-app.config['CELERY_BROKER_URL'] = config_app.CELERY_BROKER_URL
-app.config['CELERY_RESULT_BACKEND'] = config_app.CELERY_RESULT_BACKEND
-
-print(config_app.REDIS_HOST)
-print(config_app.REDIS_PORT)
 
 redis_server = redis.Redis(config_app.REDIS_HOST, config_app.REDIS_PORT)
 redis_server.set('taskid_list', '')
+
+app = Flask(__name__)
+
+# Configure Celery
 xxx = Celery(app.name, backend=config_app.CELERY_RESULT_BACKEND, broker=config_app.CELERY_BROKER_URL)
-# celery.conf.update(app.config)
 
 # Define a Celery task
 @xxx.task
 def say_hello():
     time.sleep(10)
     return "Hello, World!"
-
 
 
 # API route to trigger the task
