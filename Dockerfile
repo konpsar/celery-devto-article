@@ -14,8 +14,9 @@ RUN pip install --upgrade pip && pip install -r requirements-prod.txt
 
 # Copy app files
 COPY .env.prod .env
-COPY config_app.py config_app.py
-COPY app.py app.py
+COPY config_app.py .
+COPY app.py .
+COPY solvers/ solvers/
 
 EXPOSE 5000
 
