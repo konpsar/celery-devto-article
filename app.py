@@ -7,7 +7,6 @@ import json
 from datetime import datetime, timezone
 from solvers.solver_dispatch import dispatch_solver
 
-SUPPORTED_FILE_EXTENSIONS = {"mps"}
 
 redis_server = redis.Redis(config_app.REDIS_HOST, config_app.REDIS_PORT)
 
@@ -44,9 +43,9 @@ def solve_lp_payload():
     user_id = metadata.get('user_id', 'anonymous')
     submitted_at = datetime.now(timezone.utc).isoformat()
 
-    if content_file_ext not in SUPPORTED_FILE_EXTENSIONS:
+    if content_file_ext not in config_app.SUPPORTED_FILE_EXTENSIONS:
         return jsonify({
-            "error": f"Unsupported content_file_ext: '{content_file_ext}'. Supported formats: {', '.join(SUPPORTED_FILE_EXTENSIONS)}"
+            "error": f"Unsupported content_file_ext: '{content_file_ext}'. Supported formats: {', '.join(config_app.SUPPORTED_FILE_EXTENSIONS)}"
         }), 400
 
     # Store task metadata
