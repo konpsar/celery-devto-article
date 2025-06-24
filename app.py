@@ -5,7 +5,7 @@ import redis
 import config_app
 import json 
 from datetime import datetime, timezone
-from solver_dispatch import dispatch_solver
+from solvers.solver_dispatch import dispatch_solver
 
 SUPPORTED_FILE_EXTENSIONS = {"mps"}
 
