@@ -2,6 +2,7 @@ import requests
 import redis
 import argparse
 import json 
+from config_app import REDIS_LP_TASKS_KEY
 
 def print_lp_result(result: dict, detailed: bool = False) -> None:
     print(f"\nTask ID        : {result.get('task_id')}")
@@ -33,11 +34,10 @@ def print_lp_result(result: dict, detailed: bool = False) -> None:
 
 
 API_BASE = "http://localhost:5000"
-REDIS_KEY = "lp_tasks"
 
 redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
-tasks = redis_client.hgetall(REDIS_KEY)
+tasks = redis_client.hgetall(REDIS_LP_TASKS_KEY)
 
 if not tasks:
     print("No tasks found in Redis.")
@@ -50,13 +50,13 @@ for task_id, meta_str in tasks.items():
         data = resp.json()
         metadata = json.loads(meta_str)
 
-        print(f"\n🔍 {task_id} → Metadata: {metadata}")
+        print(f"\n{task_id} → Metadata: {metadata}")
         if not data.get("exists"):
-            print("❌ Task not found")
+            print("Task not found")
         elif data.get("result") in [None, "output file missing"]:
-            print("⏳ Still running...")
+            print("Still running...")
         else:
-            print("✅ Done")
+            print("Done")
             result = data["result"]
             print_lp_result(result, detailed=False)
     except Exception as e:
