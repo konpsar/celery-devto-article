@@ -1,3 +1,4 @@
+highspy
 flask 
 celery 
 gevent # for windows
