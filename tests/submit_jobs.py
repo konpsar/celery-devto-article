@@ -2,8 +2,8 @@ import requests
 import os
 import json
 import redis
-from config_app import REDIS_LP_TASKS_KEY
 
+REDIS_LP_TASKS_KEY = "lp_tasks"
 API_BASE = "http://localhost:5000"
 FILES = [
     "test_problems/example1.mps",

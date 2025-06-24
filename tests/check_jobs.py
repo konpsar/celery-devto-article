@@ -2,7 +2,8 @@ import requests
 import redis
 import argparse
 import json 
-from config_app import REDIS_LP_TASKS_KEY
+
+REDIS_LP_TASKS_KEY = "lp_tasks"
 
 def print_lp_result(result: dict, detailed: bool = False) -> None:
     print(f"\nTask ID        : {result.get('task_id')}")
