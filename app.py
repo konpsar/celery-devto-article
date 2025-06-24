@@ -58,7 +58,7 @@ def solve_lp_payload():
     # task = solve_mps_highs_payload.delay(content, metadata)
     task = solve_lp_payload_task.delay(content, metadata)
 
-    redis_server.hset("lp_tasks", task.id, json.dumps(metadata))
+    redis_server.hset(config_app.REDIS_LP_TASKS_KEY, task.id, json.dumps(metadata))
 
     return jsonify({
         "task_id": task.id,
@@ -71,10 +71,9 @@ def solve_lp_payload():
 @app.route('/check_lp_task/<task_id>', methods=['GET'])
 def check_lp_task(task_id):
     some_result = AsyncResult(task_id, app=xxx)
-    REDIS_KEY = "lp_tasks"
 
-    # task_found = task_id in redis_server.hvals(REDIS_KEY)
-    task_found = redis_server.hexists(REDIS_KEY, task_id)
+    # task_found = task_id in redis_server.hvals(config_app.REDIS_LP_TASKS_KEY)
+    task_found = redis_server.hexists(config_app.REDIS_LP_TASKS_KEY, task_id)
 
     if not task_found:
         return jsonify({"result": None, "exists": False, "error": "Task ID not found"}), 404
