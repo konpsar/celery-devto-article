@@ -10,7 +10,7 @@ FILES = [
     "test_problems/example2.mps",
     "test_problems/example3.mps",
     "test_problems/heavy_problem.mps",
-    "test_problems/misc07.random",
+    "test_problems/unsupported.random",
 ]
 
 redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)

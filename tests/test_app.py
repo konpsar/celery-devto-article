@@ -1,6 +1,5 @@
 import os
 import time
-import json
 import requests
 import pytest
 
@@ -131,4 +130,4 @@ def test_unsupported_file_type():
     res = requests.post(f"{API_BASE}/solve_lp_payload", json=payload)
     assert res.status_code == 400
     assert "Unsupported" in res.text
-    print("✅ Correctly rejected unsupported file type")
+    print("Correctly rejected unsupported file type")
