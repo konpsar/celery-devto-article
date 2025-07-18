@@ -17,6 +17,7 @@ COPY .env.prod .env
 COPY config_app.py .
 COPY app.py .
 COPY solvers/ solvers/
+COPY utils/ utils/
 
 EXPOSE 5000
 

@@ -14,10 +14,77 @@ app = Flask(__name__)
 
 # Configure Celery
 xxx = Celery(app.name, backend=config_app.CELERY_RESULT_BACKEND, broker=config_app.CELERY_BROKER_URL)
-xxx.conf.update(
-    result_persistent=True,
-    result_expires=3600,
-)
+# xxx.conf.update(
+#     result_persistent=True,
+#     result_expires=3600,
+# )
+
+# CLIENT SIDE GUROBI PAYLOAD:
+# payload = {
+#     "metadata": {
+#         "payload_type": "gurobi",
+#         "user_id": "test_user"
+#     }
+#     "payload": create_payload(....)
+# }
+
+
+@xxx.task
+def solve_gurobi_payload_task(metadata: dict, payload: dict) -> dict:
+    task_id = solve_gurobi_payload_task.request.id
+    try:
+        result = dispatch_solver(metadata, payload)
+        return {**result, "task_id": task_id}
+    except Exception as e:
+        return {**metadata, "error": str(e), "task_id": task_id}
+
+
+@app.route('/solve_gurobi_payload', methods=['POST'])
+def solve_gurobi_payload():
+    data = request.get_json()
+    if not data or 'payload' not in data:
+        return jsonify({"error": "Missing 'payload' key in JSON payload"}), 400
+
+    metadata = data["metadata"]
+    payload = data['payload']
+    payload_type = metadata["payload_type"] 
+    user_id = metadata.get('user_id', 'anonymous')
+    submitted_at = datetime.now(timezone.utc).isoformat()
+
+    if payload_type !="gurobi":
+        return jsonify({
+            "error": f"Unsupported payload_type: '{payload_type}'."
+        }), 400
+
+    # Store task metadata
+    metadata = {
+        "payload_type": payload_type,
+        "user_id": user_id,
+        "submitted_at": submitted_at,
+    }
+
+    task = solve_lp_payload_task.delay(metadata, payload)
+
+    redis_server.hset(config_app.REDIS_LP_TASKS_KEY, task.id, json.dumps(metadata))
+
+    return jsonify({
+        "task_id": task.id,
+        "status": "task submitted",
+        "metadata": metadata
+    }), 202
+
+
+@app.route('/check_gurobi_task/<task_id>', methods=['GET'])
+def check_gurobi_task(task_id):
+    res = AsyncResult(task_id, app=xxx)
+    task_found = redis_server.hexists(config_app.REDIS_LP_TASKS_KEY, task_id)
+    if not task_found:
+        return jsonify({"result": None, "exists": False, "error": "Task ID not found"}), 404
+    if res.ready():
+        result_data = res.get()
+        return jsonify({"result": result_data, "exists": True, "ready":True}), 200
+    else:
+        return jsonify({"result": None, "exists": True, "ready":False}), 202 
 
 
 @xxx.task
