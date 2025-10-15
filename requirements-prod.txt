@@ -1,6 +1,0 @@
-highspy
-flask 
-celery 
-gevent # for windows
-redis
-python-dotenv
