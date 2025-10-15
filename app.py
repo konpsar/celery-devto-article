@@ -17,6 +17,11 @@ xxx = Celery(app.name, backend=config_app.CELERY_RESULT_BACKEND, broker=config_a
 xxx.conf.update(
     result_persistent=True,
     result_expires=3600,
+    worker_concurrency=2,            # throttle
+    worker_prefetch_multiplier=1,    # don't prefetch too many tasks
+    task_soft_time_limit=1500,       # graceful stop
+    task_time_limit=1800,            # hard kill after this
+    task_track_started=True,         # shows STARTED in Flower so we know it's being processed
 )
 
 
