@@ -2,14 +2,16 @@ import os
 import time
 import requests
 import pytest
+from pathlib import Path
 
 API_BASE = "http://localhost:5000"
 TIMEOUT_SEC = 60
 POLL_INTERVAL = 0.5
+test_files_dir = Path(__file__).parent / "test_problems" 
 
 TEST_PROBLEMS = [
     {
-        "filename": "test_problems/example1.mps",
+        "filename": test_files_dir / "example1.mps",
         "expected": {
             "objective": 3.0,
             "model_status": "Optimal",
@@ -18,7 +20,7 @@ TEST_PROBLEMS = [
         },
     },
     {
-        "filename": "test_problems/example2.mps",
+        "filename": test_files_dir / "example2.mps",
         "expected": {
             "objective": 12.0,
             "model_status": "Optimal",
@@ -27,7 +29,7 @@ TEST_PROBLEMS = [
         },
     },
     {
-        "filename": "test_problems/example3.mps",
+        "filename": test_files_dir / "example3.mps",
         "expected": {
             "objective": 54.0,
             "model_status": "Optimal",
@@ -35,7 +37,7 @@ TEST_PROBLEMS = [
         },
     },
     {
-        "filename": "test_problems/heavy_problem.mps",
+        "filename": test_files_dir / "heavy_problem.mps",
         "expected": {
             "objective": 2809.999999999996,
             "model_status": "Optimal",
@@ -44,13 +46,12 @@ TEST_PROBLEMS = [
 ]
 
 
-@pytest.mark.parametrize("problem", TEST_PROBLEMS)
+@pytest.mark.parametrize("problem", TEST_PROBLEMS, ids=lambda p: Path(p["filename"]).name)
 def test_mps_problem(problem):
     path = problem["filename"]
-    assert os.path.exists(path), f"Missing: {path}"
+    assert path.exists(), f"Missing: {path}"
 
-    with open(path) as f:
-        content = f.read()
+    content = path.read_text()
 
     payload = {
         "content": content,
@@ -110,24 +111,29 @@ def test_mps_problem(problem):
 
 
 def test_unsupported_file_type():
-    path = "test_problems/unsupported.random"
-    with open(path, "w") as f:
-        f.write("This is not an LP format.")
+    unsupported_path = test_files_dir / "unsupported.random"
+    assert unsupported_path.exists(), f"Missing fixture: {unsupported_path}"
 
-    with open(path) as f:
-        content = f.read()
+    content = unsupported_path.read_text()
 
     payload = {
         "content": content,
         "metadata": {
-            "source_file_name": "unsupported.random",
-            "content_file_ext": "random",
-            "user_id": "pytest_user"
-        }
+            "source_file_name": unsupported_path.name,
+            "content_file_ext": unsupported_path.suffix.lstrip("."),  # "random"
+            "user_id": "pytest_user",
+        },
     }
 
     print("\nSubmitting unsupported file type (.random)")
     res = requests.post(f"{API_BASE}/solve_lp_payload", json=payload)
-    assert res.status_code == 400
-    assert "Unsupported" in res.text
+    assert res.status_code == 400, f"Expected 400, got {res.status_code}: {res.text}"
+
+    try:
+        msg = res.json().get("message", res.text)
+    except Exception:
+        msg = res.text
+
+    assert "Unsupported" in msg
     print("Correctly rejected unsupported file type")
+
