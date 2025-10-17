@@ -2,15 +2,18 @@ import requests
 import os
 import json
 import redis
+from pathlib import Path
 
 REDIS_LP_TASKS_KEY = "lp_tasks"
 API_BASE = "http://localhost:5000"
+test_files_dir = Path(__file__).parent / "test_problems" 
+
 FILES = [
-    "test_problems/example1.mps",
-    "test_problems/example2.mps",
-    "test_problems/example3.mps",
-    "test_problems/heavy_problem.mps",
-    "test_problems/unsupported.random",
+    test_files_dir / "example1.mps",
+    test_files_dir / "example2.mps",
+    test_files_dir / "example3.mps",
+    test_files_dir / "heavy_problem.mps",
+    test_files_dir / "unsupported.random",
 ]
 
 redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
@@ -28,7 +31,7 @@ for path in FILES:
         "content": content,
         "metadata": {
             "source_file_name": os.path.basename(path),
-            "content_file_ext": path.split(".")[-1].lower(),
+            "content_file_ext": path.suffix.lstrip('.').lower(),
             # "file_size": os.path.getsize(path),
             "user_id": user_id,
         }

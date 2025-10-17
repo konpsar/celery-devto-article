@@ -4,5 +4,5 @@ celery
 gevent # for windows
 redis
 python-dotenv
-pytest # for testing
-requests # for testing
+# pytest # for testing
+# requests # for testing

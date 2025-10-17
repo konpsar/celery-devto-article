@@ -9,11 +9,11 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential libblas-dev liblapack-dev
 
 # Install Python dependencies
-COPY requirements-prod.txt .
-RUN pip install --upgrade pip && pip install -r requirements-prod.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy app files
-COPY .env.prod .env
+COPY .env .env
 COPY config_app.py .
 COPY app.py .
 COPY solvers/ solvers/
