@@ -19,8 +19,8 @@ xxx.conf.update(
     result_expires=3600,
     worker_concurrency=2,            # throttle
     worker_prefetch_multiplier=1,    # don't prefetch too many tasks
-    task_soft_time_limit=1500,       # graceful stop
-    task_time_limit=1800,            # hard kill after this
+    task_soft_time_limit=1800,       # 30m - graceful stop
+    task_time_limit=2700,            # 45m - hard kill after this (task will fail with a TimeLimitExceeded exception)
     task_track_started=True,         # shows STARTED in Flower so we know it's being processed
 )
 
